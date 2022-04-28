@@ -51,7 +51,7 @@ def generate_password(pwd_len=16):
         + digits
         + punctuation
     )
-    pwd = "".join(secrets.choice(password_chars) for i in range(pwd_len))
+    pwd = "".join(secrets.choice(password_chars) for _ in range(pwd_len))
     logger.info(f'Generated password: "{pwd}"')
     return pwd
 

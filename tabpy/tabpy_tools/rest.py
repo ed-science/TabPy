@@ -70,10 +70,7 @@ class RequestsNetworkWrapper:
     def _encode_request(self, data):
         self._remove_nones(data)
 
-        if data is not None:
-            return json.dumps(data)
-        else:
-            return None
+        return json.dumps(data) if data is not None else None
 
     def GET(self, url, data, timeout=None):
         """Issues a GET request to the URL with the data specified. Returns an
@@ -87,10 +84,7 @@ class RequestsNetworkWrapper:
             self.raise_error(response)
         logger.info(f"response={response.text}")
 
-        if response.text == "":
-            return dict()
-        else:
-            return response.json()
+        return dict() if response.text == "" else response.json()
 
     def POST(self, url, data, timeout=None):
         """Issues a POST request to the URL with the data specified. Returns an
@@ -186,7 +180,7 @@ class ServiceClient:
         pattern = compile(".*(:[0-9]+)$")
         if not endpoint.endswith("/") and not pattern.match(endpoint):
             logger.warning(f"endpoint {endpoint} does not end with '/': appending.")
-            endpoint = endpoint + "/"
+            endpoint = f"{endpoint}/"
 
         self.endpoint = endpoint
 
@@ -232,13 +226,12 @@ class RESTProperty:
         self.to_json = to_json
 
     def __get__(self, instance, _):
-        if instance:
-            try:
-                return getattr(instance, self.name)
-            except AttributeError:
-                raise AttributeError(f"{self.name} has not been set yet.")
-        else:
+        if not instance:
             return self
+        try:
+            return getattr(instance, self.name)
+        except AttributeError:
+            raise AttributeError(f"{self.name} has not been set yet.")
 
     def __set__(self, instance, value):
         if value is not None and not isinstance(value, self.type):
@@ -270,7 +263,7 @@ class _RESTMetaclass(abc.ABCMeta):
 
         for k, v in dict.items():
             if isinstance(v, RESTProperty):
-                v.__dict__["name"] = "_" + k
+                v.__dict__["name"] = f"_{k}"
                 self.__rest__.add(k)
 
 
@@ -310,7 +303,9 @@ class RESTObject(MutableMapping, metaclass=_RESTMetaclass):
 
     def __repr__(self):
         return (
-            "{" + ", ".join([repr(k) + ": " + repr(v) for k, v in self.items()]) + "}"
+            "{"
+            + ", ".join([f"{repr(k)}: {repr(v)}" for k, v in self.items()])
+            + "}"
         )
 
     @classmethod
@@ -350,10 +345,10 @@ class RESTObject(MutableMapping, metaclass=_RESTMetaclass):
         )
 
     def __len__(self):
-        return len([a for a in self.__rest__ if hasattr(self, "_" + a)])
+        return len([a for a in self.__rest__ if hasattr(self, f"_{a}")])
 
     def __iter__(self):
-        return iter([a for a in self.__rest__ if hasattr(self, "_" + a)])
+        return iter([a for a in self.__rest__ if hasattr(self, f"_{a}")])
 
     def __getitem__(self, item):
         if item not in self.__rest__:
@@ -372,7 +367,7 @@ class RESTObject(MutableMapping, metaclass=_RESTMetaclass):
         if item not in self.__rest__:
             raise KeyError(item)
         try:
-            delattr(self, "_" + item)
+            delattr(self, f"_{item}")
         except AttributeError:
             raise KeyError(item)
 

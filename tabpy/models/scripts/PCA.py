@@ -38,9 +38,9 @@ def PCA(component, _arg1, _arg2, *_argN):
             transformedMatrix = oneHotEncoded.transpose()
             encodedCols += list(transformedMatrix)
 
-    dataDict = {}
-    for i in range(len(encodedCols)):
-        dataDict[f"col{1 + i}"] = list(encodedCols[i])
+    dataDict = {
+        f"col{1 + i}": list(encodedCols[i]) for i in range(len(encodedCols))
+    }
 
     if component <= 0 or component > len(dataDict):
         print("ERROR: Component specified must be >= 0 and " "<= number of arguments")

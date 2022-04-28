@@ -73,9 +73,7 @@ class ManagementHandler(BaseHandler):
         try:
             docstring = None
             if "docstring" in request_data:
-                docstring = str(
-                    bytes(request_data["docstring"], "utf-8").decode("unicode_escape")
-                )
+                docstring = bytes(request_data["docstring"], "utf-8").decode("unicode_escape")
 
             description = request_data.get("description", None)
             endpoint_type = request_data.get("type", None)

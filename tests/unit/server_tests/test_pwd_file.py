@@ -147,14 +147,14 @@ class TestPasswordFile(unittest.TestCase):
         )
         creds = {"user_1": "pwd_1", "user@2": "pwd@2", "user#3": "pwd#3"}
 
-        pwd_file_context = ""
-        for login in creds:
-            pwd_file_context += f"{login} {creds[login]}\n"
+        pwd_file_context = "".join(
+            f"{login} {value_}\n" for login, value_ in creds.items()
+        )
 
         self._set_file(self.pwd_file.name, pwd_file_context)
         app = TabPyApp(self.config_file.name)
 
         self.assertCountEqual(creds, app.credentials)
-        for login in creds:
+        for login, value in creds.items():
             self.assertIn(login, app.credentials)
-            self.assertEqual(creds[login], app.credentials[login])
+            self.assertEqual(value, app.credentials[login])

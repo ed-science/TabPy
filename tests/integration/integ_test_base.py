@@ -45,25 +45,23 @@ class IntegTestBase(unittest.TestCase):
         str
             Absolute path to state file folder.
         """
-        state_file = open(os.path.join(self.tmp_dir, "state.ini"), "w+")
-        state_file.write(
-            "[Service Info]\n"
-            "Name = TabPy Serve\n"
-            "Description = \n"
-            "Creation Time = 0\n"
-            "Access-Control-Allow-Origin = \n"
-            "Access-Control-Allow-Headers = \n"
-            "Access-Control-Allow-Methods = \n"
-            "\n"
-            "[Query Objects Service Versions]\n"
-            "\n"
-            "[Query Objects Docstrings]\n"
-            "\n"
-            "[Meta]\n"
-            "Revision Number = 1\n"
-        )
-        state_file.close()
-
+        with open(os.path.join(self.tmp_dir, "state.ini"), "w+") as state_file:
+            state_file.write(
+                "[Service Info]\n"
+                "Name = TabPy Serve\n"
+                "Description = \n"
+                "Creation Time = 0\n"
+                "Access-Control-Allow-Origin = \n"
+                "Access-Control-Allow-Headers = \n"
+                "Access-Control-Allow-Methods = \n"
+                "\n"
+                "[Query Objects Service Versions]\n"
+                "\n"
+                "[Query Objects Docstrings]\n"
+                "\n"
+                "[Meta]\n"
+                "Revision Number = 1\n"
+            )
         return self.tmp_dir
 
     def _get_port(self) -> str:
@@ -166,38 +164,36 @@ class IntegTestBase(unittest.TestCase):
         str
             Absolute path to config file.
         """
-        config_file = open(os.path.join(self.tmp_dir, "test.conf"), "w+")
-        config_file.write(
-            "[TabPy]\n"
-            f"TABPY_QUERY_OBJECT_PATH = {self.tmp_dir}/query_objects\n"
-            f"TABPY_PORT = {self._get_port()}\n"
-            f"TABPY_STATE_PATH = {self.tmp_dir}\n"
-        )
+        with open(os.path.join(self.tmp_dir, "test.conf"), "w+") as config_file:
+            config_file.write(
+                "[TabPy]\n"
+                f"TABPY_QUERY_OBJECT_PATH = {self.tmp_dir}/query_objects\n"
+                f"TABPY_PORT = {self._get_port()}\n"
+                f"TABPY_STATE_PATH = {self.tmp_dir}\n"
+            )
 
-        pwd_file = self._get_pwd_file()
-        if pwd_file is not None:
-            pwd_file = os.path.abspath(pwd_file)
-            config_file.write(f"TABPY_PWD_FILE = {pwd_file}\n")
+            pwd_file = self._get_pwd_file()
+            if pwd_file is not None:
+                pwd_file = os.path.abspath(pwd_file)
+                config_file.write(f"TABPY_PWD_FILE = {pwd_file}\n")
 
-        transfer_protocol = self._get_transfer_protocol()
-        if transfer_protocol is not None:
-            config_file.write(f"TABPY_TRANSFER_PROTOCOL = {transfer_protocol}\n")
+            transfer_protocol = self._get_transfer_protocol()
+            if transfer_protocol is not None:
+                config_file.write(f"TABPY_TRANSFER_PROTOCOL = {transfer_protocol}\n")
 
-        cert_file_name = self._get_certificate_file_name()
-        if cert_file_name is not None:
-            cert_file_name = os.path.abspath(cert_file_name)
-            config_file.write(f"TABPY_CERTIFICATE_FILE = {cert_file_name}\n")
+            cert_file_name = self._get_certificate_file_name()
+            if cert_file_name is not None:
+                cert_file_name = os.path.abspath(cert_file_name)
+                config_file.write(f"TABPY_CERTIFICATE_FILE = {cert_file_name}\n")
 
-        key_file_name = self._get_key_file_name()
-        if key_file_name is not None:
-            key_file_name = os.path.abspath(key_file_name)
-            config_file.write(f"TABPY_KEY_FILE = {key_file_name}\n")
+            key_file_name = self._get_key_file_name()
+            if key_file_name is not None:
+                key_file_name = os.path.abspath(key_file_name)
+                config_file.write(f"TABPY_KEY_FILE = {key_file_name}\n")
 
-        evaluate_timeout = self._get_evaluate_timeout()
-        if evaluate_timeout is not None:
-            config_file.write(f"TABPY_EVALUATE_TIMEOUT = {evaluate_timeout}\n")
-
-        config_file.close()
+            evaluate_timeout = self._get_evaluate_timeout()
+            if evaluate_timeout is not None:
+                config_file.write(f"TABPY_EVALUATE_TIMEOUT = {evaluate_timeout}\n")
 
         self.delete_config_file = True
         return config_file.name
@@ -209,24 +205,26 @@ class IntegTestBase(unittest.TestCase):
 
         # create temporary state.ini
         orig_state_file_name = os.path.abspath(
-            self._get_state_file_path() + "/state.ini"
+            f"{self._get_state_file_path()}/state.ini"
         )
-        self.state_file_name = os.path.abspath(self.tmp_dir + "/state.ini")
+
+        self.state_file_name = os.path.abspath(f"{self.tmp_dir}/state.ini")
         if orig_state_file_name != self.state_file_name:
             shutil.copyfile(orig_state_file_name, self.state_file_name)
 
         # create config file
         orig_config_file_name = os.path.abspath(self._get_config_file_name())
         self.config_file_name = os.path.abspath(
-            self.tmp_dir + "/" + os.path.basename(orig_config_file_name)
+            f"{self.tmp_dir}/{os.path.basename(orig_config_file_name)}"
         )
+
         if orig_config_file_name != self.config_file_name:
             shutil.copyfile(orig_config_file_name, self.config_file_name)
 
         # Platform specific - for integration tests we want to engage
         # startup script
-        with open(self.tmp_dir + "/output.txt", "w") as outfile:
-            cmd = ["tabpy", "--config=" + self.config_file_name]
+        with open(f"{self.tmp_dir}/output.txt", "w") as outfile:
+            cmd = ["tabpy", f"--config={self.config_file_name}"]
             preexec_fn = None
             if platform.system() == "Windows":
                 self.py = "python"
@@ -270,19 +268,18 @@ class IntegTestBase(unittest.TestCase):
             url = "https://"
         else:
             url = "http://"
-        url += "localhost:" + self._get_port()
+        url += f"localhost:{self._get_port()}"
         return url
 
     def _get_connection(self) -> http.client.HTTPConnection:
         protocol = self._get_transfer_protocol()
-        url = "localhost:" + self._get_port()
+        url = f"localhost:{self._get_port()}"
 
-        if protocol is not None and protocol.lower() == "https":
-            connection = http.client.HTTPSConnection(url)
-        else:
-            connection = http.client.HTTPConnection(url)
-
-        return connection
+        return (
+            http.client.HTTPSConnection(url)
+            if protocol is not None and protocol.lower() == "https"
+            else http.client.HTTPConnection(url)
+        )
 
     def _get_username(self) -> str:
         return "user1"
@@ -293,7 +290,7 @@ class IntegTestBase(unittest.TestCase):
     def deploy_models(self, username: str, password: str):
         repo_dir = os.path.abspath(os.path.dirname(tabpy.__file__))
         path = os.path.join(repo_dir, "models", "deploy_models.py")
-        with open(self.tmp_dir + "/deploy_models_output.txt", "w") as outfile:
+        with open(f"{self.tmp_dir}/deploy_models_output.txt", "w") as outfile:
             outfile.write(
                 f"--<< Running {self.py} {path} "
                 f"{self._get_config_file_name()} >>--\n"

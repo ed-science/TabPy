@@ -62,9 +62,7 @@ class QueryObject(abc.ABC):
         except OSError as e:
             import errno
 
-            if e.errno == errno.EEXIST and os.path.isdir(path):
-                pass
-            else:
+            if e.errno != errno.EEXIST or not os.path.isdir(path):
                 raise
 
         with open(os.path.join(path, "pickle_archive"), "wb") as f:

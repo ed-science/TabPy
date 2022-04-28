@@ -141,9 +141,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
         self.logger.log(
             logging.ERROR,
-            'Responding with status={}, message="{}", info="{}"'.format(
-                code, log_message, info
-            ),
+            f'Responding with status={code}, message="{log_message}", info="{info}"',
         )
 
     def options(self):
@@ -223,7 +221,7 @@ class BaseHandler(tornado.web.RequestHandler):
             )
 
         methods = auth_feature["methods"]
-        if "basic-auth" in auth_feature["methods"]:
+        if "basic-auth" in methods:
             return True, "basic-auth"
         # Add new methods here...
 

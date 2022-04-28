@@ -142,7 +142,9 @@ class RESTServiceClient:
                 "querying an endpoint is not supported."
             )
         return self.service_client.POST(
-            "query/" + name, data={"data": args or kwargs}, timeout=self.query_timeout
+            f"query/{name}",
+            data={"data": args or kwargs},
+            timeout=self.query_timeout,
         )
 
     def get_endpoint_upload_destination(self):
@@ -187,7 +189,10 @@ class RESTServiceClient:
 
             The name of the endpoint.
         """
-        ((name, attrs),) = self.service_client.GET("endpoints/" + endpoint_name).items()
+        ((name, attrs),) = self.service_client.GET(
+            f"endpoints/{endpoint_name}"
+        ).items()
+
         endpoint = Endpoint.from_json(attrs)
         endpoint.name = name
         return endpoint
@@ -212,7 +217,9 @@ class RESTServiceClient:
 
             The endpoint to update.
         """
-        return self.service_client.PUT("endpoints/" + endpoint.name, endpoint.to_json())
+        return self.service_client.PUT(
+            f"endpoints/{endpoint.name}", endpoint.to_json()
+        )
 
     def remove_endpoint(self, endpoint_name):
         """Deletes an endpoint through the management API.
@@ -224,7 +231,7 @@ class RESTServiceClient:
 
             The endpoint to delete.
         """
-        self.service_client.DELETE("endpoints/" + endpoint_name)
+        self.service_client.DELETE(f"endpoints/{endpoint_name}")
 
     def get_status(self):
         """Returns the status of the server.

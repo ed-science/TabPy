@@ -20,39 +20,37 @@ class TestEvaluate(integ_test_base.IntegTestBase):
         str
             Absolute path to config file.
         """
-        config_file = open(os.path.join(self.tmp_dir, "test.conf"), "w+")
-        config_file.write(
-            "[TabPy]\n"
-            f"TABPY_QUERY_OBJECT_PATH = {self.tmp_dir}/query_objects\n"
-            f"TABPY_PORT = {self._get_port()}\n"
-            f"TABPY_GZIP_ENABLE = TRUE\n"
-            f"TABPY_STATE_PATH = {self.tmp_dir}\n"
-        )
+        with open(os.path.join(self.tmp_dir, "test.conf"), "w+") as config_file:
+            config_file.write(
+                "[TabPy]\n"
+                f"TABPY_QUERY_OBJECT_PATH = {self.tmp_dir}/query_objects\n"
+                f"TABPY_PORT = {self._get_port()}\n"
+                f"TABPY_GZIP_ENABLE = TRUE\n"
+                f"TABPY_STATE_PATH = {self.tmp_dir}\n"
+            )
 
-        pwd_file = self._get_pwd_file()
-        if pwd_file is not None:
-            pwd_file = os.path.abspath(pwd_file)
-            config_file.write(f"TABPY_PWD_FILE = {pwd_file}\n")
+            pwd_file = self._get_pwd_file()
+            if pwd_file is not None:
+                pwd_file = os.path.abspath(pwd_file)
+                config_file.write(f"TABPY_PWD_FILE = {pwd_file}\n")
 
-        transfer_protocol = self._get_transfer_protocol()
-        if transfer_protocol is not None:
-            config_file.write(f"TABPY_TRANSFER_PROTOCOL = {transfer_protocol}\n")
+            transfer_protocol = self._get_transfer_protocol()
+            if transfer_protocol is not None:
+                config_file.write(f"TABPY_TRANSFER_PROTOCOL = {transfer_protocol}\n")
 
-        cert_file_name = self._get_certificate_file_name()
-        if cert_file_name is not None:
-            cert_file_name = os.path.abspath(cert_file_name)
-            config_file.write(f"TABPY_CERTIFICATE_FILE = {cert_file_name}\n")
+            cert_file_name = self._get_certificate_file_name()
+            if cert_file_name is not None:
+                cert_file_name = os.path.abspath(cert_file_name)
+                config_file.write(f"TABPY_CERTIFICATE_FILE = {cert_file_name}\n")
 
-        key_file_name = self._get_key_file_name()
-        if key_file_name is not None:
-            key_file_name = os.path.abspath(key_file_name)
-            config_file.write(f"TABPY_KEY_FILE = {key_file_name}\n")
+            key_file_name = self._get_key_file_name()
+            if key_file_name is not None:
+                key_file_name = os.path.abspath(key_file_name)
+                config_file.write(f"TABPY_KEY_FILE = {key_file_name}\n")
 
-        evaluate_timeout = self._get_evaluate_timeout()
-        if evaluate_timeout is not None:
-            config_file.write(f"TABPY_EVALUATE_TIMEOUT = {evaluate_timeout}\n")
-
-        config_file.close()
+            evaluate_timeout = self._get_evaluate_timeout()
+            if evaluate_timeout is not None:
+                config_file.write(f"TABPY_EVALUATE_TIMEOUT = {evaluate_timeout}\n")
 
         self.delete_config_file = True
         return config_file.name
@@ -70,7 +68,7 @@ class TestEvaluate(integ_test_base.IntegTestBase):
             "Content-Encoding": "gzip",
         }
 
-        url = self._get_url() + "/evaluate"
+        url = f"{self._get_url()}/evaluate"
         response = requests.request("POST", url, data=gzip.compress(payload.encode('utf-8')),
             headers=headers)
         result = json.loads(response.text)
@@ -91,7 +89,7 @@ class TestEvaluate(integ_test_base.IntegTestBase):
             "Content-Encoding": "gzip",
         }
 
-        url = self._get_url() + "/evaluate"
+        url = f"{self._get_url()}/evaluate"
         response = requests.request("POST", url, data=gzip.compress(payload.encode('utf-8')),
             headers=headers)
         result = json.loads(response.text)

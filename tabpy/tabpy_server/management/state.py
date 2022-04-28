@@ -59,8 +59,7 @@ def get_query_object_path(state_file_path, name, version):
     sub_path = [_QUERY_OBJECT_DIR, name]
     if version is not None:
         sub_path.append(str(version))
-    full_path = root_path + "/".join(sub_path)
-    return full_path
+    return root_path + "/".join(sub_path)
 
 
 class TabPyState:
@@ -129,9 +128,7 @@ class TabPyState:
         if name:
             endpoint_info = json.loads(endpoint_names)
             docstring = self._get_config_value(_QUERY_OBJECT_DOCSTRING, name)
-            endpoint_info["docstring"] = str(
-                bytes(docstring, "utf-8").decode("unicode_escape")
-            )
+            endpoint_info["docstring"] = bytes(docstring, "utf-8").decode("unicode_escape")
             endpoints = {name: endpoint_info}
         else:
             for endpoint_name in endpoint_names:
@@ -141,9 +138,7 @@ class TabPyState:
                 docstring = self._get_config_value(
                     _QUERY_OBJECT_DOCSTRING, endpoint_name, True, ""
                 )
-                endpoint_info["docstring"] = str(
-                    bytes(docstring, "utf-8").decode("unicode_escape")
-                )
+                endpoint_info["docstring"] = bytes(docstring, "utf-8").decode("unicode_escape")
                 endpoints[endpoint_name] = endpoint_info
         logger.debug(f"Collected endpoints: {endpoints}")
         return endpoints
@@ -182,10 +177,7 @@ class TabPyState:
         if not dependencies:
             return defaultValue
 
-        if dependencies or not isinstance(dependencies, list):
-            raise ValueError("dependencies must be a list.")
-
-        return dependencies
+        raise ValueError("dependencies must be a list.")
 
     @state_lock
     def add_endpoint(
@@ -260,9 +252,7 @@ class TabPyState:
         for endpoint_name in endpoints:
             try:
                 info = endpoints[endpoint_name]
-                dstring = str(
-                    bytes(info["docstring"], "utf-8").decode("unicode_escape")
-                )
+                dstring = bytes(info["docstring"], "utf-8").decode("unicode_escape")
                 self._set_config_value(
                     _QUERY_OBJECT_DOCSTRING,
                     endpoint_name,
@@ -396,7 +386,7 @@ class TabPyState:
                     deps.add(endpoint_name)
 
         # check if other endpoints are depending on this endpoint
-        if len(deps) > 0:
+        if deps:
             raise ValueError(
                 f"Cannot remove endpoint {name}, it is currently "
                 f"used by {list(deps)} endpoints."

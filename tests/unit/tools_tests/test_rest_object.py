@@ -6,6 +6,7 @@ from tabpy.tabpy_tools.rest import RESTObject, RESTProperty, enum
 
 class TestRESTObject(unittest.TestCase):
     def test_new_class(self):
+
         class FooObject(RESTObject):
             f = RESTProperty(float)
             i = RESTProperty(int)
@@ -32,10 +33,10 @@ class TestRESTObject(unittest.TestCase):
             f["cat"] = 5
 
         self.assertEqual(len(f), 3)
-        self.assertEqual(set(f), set(["f", "i", "s"]))
-        self.assertEqual(set(f.keys()), set(["f", "i", "s"]))
-        self.assertEqual(set(f.values()), set([6.0, 3, "hello!"]))
-        self.assertEqual(set(f.items()), set([("f", 6.0), ("i", 3), ("s", "hello!")]))
+        self.assertEqual(set(f), {"f", "i", "s"})
+        self.assertEqual(set(f.keys()), {"f", "i", "s"})
+        self.assertEqual(set(f.values()), {6.0, 3, "hello!"})
+        self.assertEqual(set(f.items()), {("f", 6.0), ("i", 3), ("s", "hello!")})
 
         f.e = "a"
         self.assertEqual(f.e, "a")
