@@ -27,17 +27,16 @@ def _generate_schema_from_example_and_description(input, description):
             for key in description:
                 # Case for input = {'x':1},
                 # input_description={'x':'x value', 'y':'y value'}
-                if key not in input_schema["properties"]:
+                if key in input_schema["properties"]:
+                    input_schema["properties"][key]["description"] = description[key]
+                else:
                     msg = f"{key} not found in {input}"
                     logger.error(msg)
                     raise Exception(msg)
-                else:
-                    input_schema["properties"][key]["description"] = description[key]
+        elif isinstance(description, dict):
+            raise Exception(f"{input} and {description} do not match")
         else:
-            if isinstance(description, dict):
-                raise Exception(f"{input} and {description} do not match")
-            else:
-                input_schema["description"] = description
+            input_schema["description"] = description
 
     try:
         # This should not fail unless there are bugs with either genson or

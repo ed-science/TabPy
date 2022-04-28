@@ -30,10 +30,9 @@ def wait_for_endpoint_loaded(python_service, object_uri):
             return
 
         for (uri, info) in list_object_msg.objects.items():
-            if uri == object_uri:
-                if info["status"] != "LoadInProgress":
-                    logger.info(f'Object load status: {info["status"]}')
-                    return
+            if uri == object_uri and info["status"] != "LoadInProgress":
+                logger.info(f'Object load status: {info["status"]}')
+                return
 
         sleep(0.1)
 
@@ -160,16 +159,7 @@ def on_state_change(
                 object_name
             ]
 
-            if not object_path and not object_version:  # removal
-                logger.info(f"Removing object: URI={object_name}")
-
-                python_service.manage_request(DeleteObjects([object_name]))
-
-                cleanup_endpoint_files(
-                    object_name, settings[SettingsParameters.UploadDir], logger=logger
-                )
-
-            else:
+            if object_path or object_version:
                 endpoint_info = new_endpoints[object_name]
                 is_update = object_version > 1
                 if object_type == "alias":
@@ -197,6 +187,15 @@ def on_state_change(
                         logger=logger,
                         retain_versions=[object_version, object_version - 1],
                     )
+
+            else:  # removal
+                logger.info(f"Removing object: URI={object_name}")
+
+                python_service.manage_request(DeleteObjects([object_name]))
+
+                cleanup_endpoint_files(
+                    object_name, settings[SettingsParameters.UploadDir], logger=logger
+                )
 
     except Exception as e:
         err_msg = format_exception(e, "on_state_change")

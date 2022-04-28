@@ -68,13 +68,9 @@ class EvaluationPlaneHandler(BaseHandler):
             self.error_out(400, "Script is empty.")
             return
 
-        # Transforming user script into a proper function.
-        user_code = body["script"]
-        arguments = None
         arguments_str = ""
-        if "data" in body:
-            arguments = body["data"]
-
+        user_code = body["script"]
+        arguments = body["data"] if "data" in body else None
         if arguments is not None:
             if not isinstance(arguments, dict):
                 self.error_out(
@@ -83,7 +79,7 @@ class EvaluationPlaneHandler(BaseHandler):
                 return
             args_in = sorted(arguments.keys())
             n = len(arguments)
-            if sorted('_arg'+str(i+1) for i in range(n)) == args_in:
+            if sorted(f'_arg{str(i+1)}' for i in range(n)) == args_in:
                 arguments_str = ", " + ", ".join(args_in)
             else:
                 self.error_out(
@@ -94,7 +90,7 @@ class EvaluationPlaneHandler(BaseHandler):
                 return
         function_to_evaluate = f"def _user_script(tabpy{arguments_str}):\n"
         for u in user_code.splitlines():
-            function_to_evaluate += " " + u + "\n"
+            function_to_evaluate += f" {u}" + "\n"
 
         self.logger.log(
             logging.INFO, f"function to evaluate={function_to_evaluate}"

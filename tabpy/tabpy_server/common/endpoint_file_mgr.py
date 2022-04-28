@@ -45,14 +45,12 @@ def grab_files(directory):
     """
     if not os.path.isdir(directory):
         return
-    else:
-        for name in os.listdir(directory):
-            full_path = os.path.join(directory, name)
-            if os.path.isdir(full_path):
-                for entry in grab_files(full_path):
-                    yield entry
-            elif os.path.isfile(full_path):
-                yield full_path
+    for name in os.listdir(directory):
+        full_path = os.path.join(directory, name)
+        if os.path.isdir(full_path):
+            yield from grab_files(full_path)
+        elif os.path.isfile(full_path):
+            yield full_path
 
 
 def cleanup_endpoint_files(

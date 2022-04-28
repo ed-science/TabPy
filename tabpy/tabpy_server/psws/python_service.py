@@ -184,16 +184,14 @@ class PythonService:
                 deleted.extend(self.delete_objects(uri).uris)
             return ObjectsDeleted(deleted)
         elif isinstance(object_uris, str):
-            deleted_obj = self.query_objects.pop(object_uris, None)
-            if deleted_obj:
+            if deleted_obj := self.query_objects.pop(object_uris, None):
                 return ObjectsDeleted([object_uris])
-            else:
-                logger.warning(
-                    f"Received message to delete query object "
-                    f"that doesn't exist: "
-                    f"object_uris={object_uris}"
-                )
-                return ObjectsDeleted([])
+            logger.warning(
+                f"Received message to delete query object "
+                f"that doesn't exist: "
+                f"object_uris={object_uris}"
+            )
+            return ObjectsDeleted([])
         else:
             logger.error(
                 f"Unexpected input to delete objects: input={object_uris}, "
@@ -211,23 +209,25 @@ class PythonService:
 
     def count_objects(self):
         """Count the number of Loaded QueryObjects stored in memory"""
-        count = 0
-        for uri, po in self.query_objects.items():
-            if po["endpoint_obj"] is not None:
-                count += 1
+        count = sum(
+            po["endpoint_obj"] is not None
+            for uri, po in self.query_objects.items()
+        )
+
         return ObjectCount(count)
 
     def list_objects(self):
         """List the objects as (URI, version) pairs"""
 
-        objects = {}
-        for (uri, obj_info) in self.query_objects.items():
-            objects[uri] = {
+        objects = {
+            uri: {
                 "version": obj_info["version"],
                 "type": obj_info["type"],
                 "status": obj_info["status"],
                 "reason": obj_info["last_error"],
             }
+            for (uri, obj_info) in self.query_objects.items()
+        }
 
         return ObjectList(objects)
 
@@ -246,28 +246,28 @@ class PythonService:
 
             obj_info = self.query_objects.get(object_uri)
             logger.debug(f"Found object {obj_info}")
-            if obj_info:
-                pred_obj = obj_info["endpoint_obj"]
-                version = obj_info["version"]
-
-                if not pred_obj:
-                    return QueryFailed(
-                        uri=object_uri,
-                        error=(
-                            "There is no query object associated to the "
-                            f"endpoint: {object_uri}"
-                        ),
-                    )
-
-                logger.debug(f"Querying endpoint with params ({params})...")
-                if isinstance(params, dict):
-                    result = pred_obj.query(**params)
-                else:
-                    result = pred_obj.query(*params)
-
-                return QuerySuccessful(object_uri, version, result)
-            else:
+            if not obj_info:
                 return UnknownURI(object_uri)
+            pred_obj = obj_info["endpoint_obj"]
+            version = obj_info["version"]
+
+            if not pred_obj:
+                return QueryFailed(
+                    uri=object_uri,
+                    error=(
+                        "There is no query object associated to the "
+                        f"endpoint: {object_uri}"
+                    ),
+                )
+
+            logger.debug(f"Querying endpoint with params ({params})...")
+            result = (
+                pred_obj.query(**params)
+                if isinstance(params, dict)
+                else pred_obj.query(*params)
+            )
+
+            return QuerySuccessful(object_uri, version, result)
         except Exception as e:
             logger.exception(e)
             err_msg = format_exception(e, "/query")

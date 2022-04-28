@@ -197,9 +197,7 @@ class TestTransferProtocolValidation(unittest.TestCase):
 
     @staticmethod
     def mock_isfile(target_file, existing_files):
-        if target_file in existing_files:
-            return True
-        return False
+        return target_file in existing_files
 
     @staticmethod
     def raise_attribute_error():

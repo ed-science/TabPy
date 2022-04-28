@@ -13,8 +13,7 @@ class ServiceInfoHandler(ManagementHandler):
             return
 
         self._add_CORS_header()
-        info = {}
-        info["description"] = self.tabpy_state.get_description()
+        info = {"description": self.tabpy_state.get_description()}
         info["creation_time"] = self.tabpy_state.creation_time
         info["state_path"] = self.settings[SettingsParameters.StateFilePath]
         info["server_version"] = self.settings[SettingsParameters.ServerVersion]

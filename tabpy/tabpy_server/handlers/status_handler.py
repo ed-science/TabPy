@@ -14,14 +14,15 @@ class StatusHandler(BaseHandler):
 
         self._add_CORS_header()
 
-        status_dict = {}
-        for k, v in self.python_service.ps.query_objects.items():
-            status_dict[k] = {
+        status_dict = {
+            k: {
                 "version": v["version"],
                 "type": v["type"],
                 "status": v["status"],
                 "last_error": v["last_error"],
             }
+            for k, v in self.python_service.ps.query_objects.items()
+        }
 
         self.logger.log(logging.DEBUG, f"Found models: {status_dict}")
         self.write(json.dumps(status_dict))

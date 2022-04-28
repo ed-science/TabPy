@@ -21,11 +21,11 @@ def validate_cert(cert_file_path):
 
     https_error = "Error using HTTPS: "
     if now < not_before:
-        msg = https_error + f"The certificate provided is not valid until {not_before}."
+        msg = f"{https_error}The certificate provided is not valid until {not_before}."
         logger.critical(msg)
         raise RuntimeError(msg)
     if now > not_after:
-        msg = https_error + f"The certificate provided expired on {not_after}."
+        msg = f"{https_error}The certificate provided expired on {not_after}."
         logger.critical(msg)
         raise RuntimeError(msg)
 

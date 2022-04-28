@@ -32,15 +32,14 @@ class EndpointHandler(ManagementHandler):
         self._add_CORS_header()
         if not endpoint_name:
             self.write(json.dumps(self.tabpy_state.get_endpoints()))
+        elif endpoint_name in self.tabpy_state.get_endpoints():
+            self.write(json.dumps(self.tabpy_state.get_endpoints()[endpoint_name]))
         else:
-            if endpoint_name in self.tabpy_state.get_endpoints():
-                self.write(json.dumps(self.tabpy_state.get_endpoints()[endpoint_name]))
-            else:
-                self.error_out(
-                    404,
-                    "Unknown endpoint",
-                    info=f"Endpoint {endpoint_name} is not found",
-                )
+            self.error_out(
+                404,
+                "Unknown endpoint",
+                info=f"Endpoint {endpoint_name} is not found",
+            )
 
     @gen.coroutine
     def put(self, name):
@@ -78,11 +77,9 @@ class EndpointHandler(ManagementHandler):
             )
             if err_msg:
                 self.error_out(400, err_msg)
-                self.finish()
             else:
                 self.write(self.tabpy_state.get_endpoints(name))
-                self.finish()
-
+            self.finish()
         except Exception as e:
             err_msg = format_exception(e, "update_endpoint")
             self.error_out(500, err_msg)

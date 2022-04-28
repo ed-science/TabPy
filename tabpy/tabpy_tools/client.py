@@ -77,7 +77,7 @@ class Client:
         service_client = ServiceClient(self._endpoint, network_wrapper)
 
         self._service = RESTServiceClient(service_client)
-        if not type(query_timeout) in (int, float) or query_timeout <= 0:
+        if type(query_timeout) not in (int, float) or query_timeout <= 0:
             query_timeout = 0.0
         self._service.query_timeout = query_timeout
 
